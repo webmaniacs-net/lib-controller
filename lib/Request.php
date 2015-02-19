@@ -3,7 +3,6 @@ namespace wmlib\controller;
 
 use Psr\Http\Message\StreamableInterface;
 use wmlib\controller\SessionStorage\Native;
-use wmlib\uri\Url;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -101,7 +100,8 @@ class Request implements ServerRequestInterface
         $method = self::METHOD_GET,
         $params = array(),
         $version = self::VERSION_1_1
-    ) {
+    )
+    {
         $this->_baseUrl = $baseUrl ? $baseUrl : new Url('');
         $this->_url = $url;
         $this->_method = $method;
@@ -231,18 +231,18 @@ class Request implements ServerRequestInterface
 
 
     /**
-     * @return unknown
+     * @return array
      */
     public function getCookies($names = array())
     {
         if ($names) {
-            $return = array();
+            $return = [];
             foreach ($names as $name) {
                 $return[] = $this->getCookie($name);
             }
             return $return;
         } else {
-            $return = array();
+            $return = [];
             foreach ($this->_cookies as $name => $value) {
                 $return[$name] = $value;
             }

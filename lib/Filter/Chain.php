@@ -103,6 +103,8 @@ class Chain implements LoggerAwareInterface
             list($filter, $arguments) = $this->_filters[$this->_position];
             $this->_arguments = $arguments;
 
+            /** @var $filter Filter */
+
             $filter->doPostFilter($request, $response, $this, $flag);
         }
     }
@@ -117,6 +119,8 @@ class Chain implements LoggerAwareInterface
         if (isset($this->_filters[$this->_position])) {
             list($filter, $arguments) = $this->_filters[$this->_position++];
             $this->_arguments = $arguments;
+
+            /** @var $filter Filter */
 
             return $filter->doPreFilter($request, $response, $this);
         } else {

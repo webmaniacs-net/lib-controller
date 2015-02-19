@@ -4,7 +4,7 @@
 namespace wmlib\controller\Tests;
 
 use wmlib\controller\Request;
-use wmlib\uri\Url;
+use wmlib\controller\Url;
 
 
 class RequestTest extends \PHPUnit_Framework_TestCase {

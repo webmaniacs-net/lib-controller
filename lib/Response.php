@@ -42,7 +42,15 @@ class Response implements ResponseInterface
 
     const SESSION_COOKIE_NAME = 'sid';
 
-    private $_status = self::STATUS_OK;
+    /**
+     * @var int
+     */
+    private $_status;
+
+    /**
+     * @var string
+     */
+    private $_statusMessage;
 
     private static $_StatusMessages = array(
         self::STATUS_OK => 'OK',
@@ -97,6 +105,8 @@ class Response implements ResponseInterface
         //if (!isset($this->sessions['velocity.notices'])) $this->sessions['velocity.notices'] = $request->getSession('velocity.notices');
 
         $this->_status = self::STATUS_OK;
+        $this->_statusMessage = self::$_StatusMessages[$this->_status];
+
         $this->_headers = array(self::HEADER_CONTENT_TYPE => [sprintf('%s; charset=utf-8', self::CONTENT_TYPE_HTML)]);
 
     }
@@ -175,7 +185,7 @@ class Response implements ResponseInterface
      *
      * @deprecated
      * @param string $error_message
-     * @return velocity_response Fluent API support
+     * @return Response Fluent API support
      */
     public function addError($error_message)
     {
@@ -304,7 +314,6 @@ class Response implements ResponseInterface
     /**
      * Alias to get content-type header
      *
-     * @param string mime
      * @return string Content type
      */
     public function getContentType()
@@ -365,23 +374,6 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Set response HTTP status
-     *
-     * @deprecated
-     * @param $code
-     * @param string $message
-     */
-    public function setStatus($code, $message = '')
-    {
-        if (!$message) {
-            $message = isset(self::$_StatusMessages[$code]) ? self::$_StatusMessages[$code] : '';
-        }
-
-        $this->_status = $code;
-    }
-
-
-    /**
      * Gets the HTTP protocol version as a string.
      *
      * The string MUST contain only the HTTP version number (e.g., "1.1", "1.0").
@@ -428,9 +420,10 @@ class Response implements ResponseInterface
     {
         $response = clone $this;
         $response->_status = $code;
-        if ($reasonPhrase) {
-            //$response->
+        if (!$reasonPhrase) {
+            $reasonPhrase = isset(self::$_StatusMessages[$code]) ? self::$_StatusMessages[$code] : '';
         }
+        $response->_statusMessage = $reasonPhrase;
 
         return $response;
     }

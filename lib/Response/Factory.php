@@ -2,7 +2,7 @@
 namespace wmlib\controller\Response;
 
 use wmlib\controller\Response;
-use wmlib\uri\Url;
+use wmlib\controller\Url;
 
 class Factory
 {

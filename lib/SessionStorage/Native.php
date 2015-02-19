@@ -40,7 +40,7 @@ class Native implements ISessionStorage
      * Remove session property
      *
      * @param $key
-     * @return mixed|void Old value if found
+     * @return mixed|null Old value if found
      */
     public function remove($key)
     {
@@ -49,7 +49,7 @@ class Native implements ISessionStorage
             unset($_SESSION[$key]);
             return $existed;
         }
-        return;
+        return null;
     }
 
     /**

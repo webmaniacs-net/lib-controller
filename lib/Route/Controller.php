@@ -35,6 +35,9 @@ class Controller extends Route
      */
     private $reflectionMethod;
 
+    /**
+     * @var object
+     */
     protected $controller;
 
     public function __construct($controller = null, $action = null)
@@ -111,7 +114,7 @@ class Controller extends Route
     }
 
     /**
-     * @return unknown
+     * @return object|null
      */
     public function getController()
     {
@@ -119,7 +122,7 @@ class Controller extends Route
     }
 
     /**
-     * @param unknown_type $controller
+     * @param object $controller
      */
     public function setController($controller)
     {
@@ -142,7 +145,7 @@ class Controller extends Route
                     $arguments);
                 if ($post_return === self::POST_REDIRECT) {
 
-                    return Response\Factory::Redirect($response, $this->uri($request->getParams()));
+                    return Response\Factory::Redirect($response, $request->getUrl(true));
                 }
             }
         }
@@ -177,7 +180,8 @@ class Controller extends Route
         Request $request,
         Response $response,
         array $arguments = []
-    ) {
+    )
+    {
         $param_name = $param->getName();
 
         /* @var $param \ReflectionParameter */
@@ -189,8 +193,6 @@ class Controller extends Route
                     return $response;
                 case Request::CLASS:
                     return $request;
-                case Router::CLASS:
-                    return $this->getParent();
             }
         }
 
@@ -218,7 +220,8 @@ class Controller extends Route
         Request $request,
         Response $response,
         array $arguments = []
-    ) {
+    )
+    {
         /**
          * Create view
          */

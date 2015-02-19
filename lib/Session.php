@@ -83,7 +83,7 @@ class Session
         if ($storage->has($name)) {
             return $storage->remove($name);
         }
-        return;
+        return null;
     }
 
     /**
@@ -102,7 +102,7 @@ class Session
         if ($storage->set($name, $data)) {
             return $data;
         }
-        return;
+        return null;
     }
 
     /**

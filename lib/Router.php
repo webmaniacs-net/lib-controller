@@ -1,8 +1,6 @@
 <?php
 namespace wmlib\controller;
 
-use wmlib\uri\Url;
-
 
 class Router extends Route
 {
@@ -84,7 +82,11 @@ class Router extends Route
     /**
      * Add route
      *
-     * @return Route Route fluent API support
+     * @param $pattern
+     * @param Route $route
+     * @param null $name
+     * @param array $attributes
+     * @return Route Added route fluent API support
      */
     public function addRoute($pattern, Route $route, $name = null, array $attributes = [])
     {
@@ -235,9 +237,10 @@ class Router extends Route
     /**
      * Check if route is matched to pattern
      *
+     * @param $pattern
      * @param $uri
-     * @param unknown_type $params
-     * @return boolean
+     * @param array $params
+     * @return bool|string
      */
     protected static function _IsMatch($pattern, $uri, &$params = array())
     {
@@ -246,7 +249,7 @@ class Router extends Route
 
         while ($pattern) {
             if (preg_match('/^' . self::URL_VARIABLE_PATTERN . '/', $pattern, $matches)) {
-                list($part, $mask, $reg, $key) = $matches;
+                list($part, , $reg, $key) = $matches;
 
                 $uri_pattern = $reg ? $reg : self::DEFAULT_REGEX;
 
@@ -288,7 +291,10 @@ class Router extends Route
      * Get matched route or null
      *
      * @param Url|string $uri
-     * @return Route
+     * @param array $params
+     * @param Url|null $matched
+     * @return Route|null
+     * @throws \Exception
      */
     public function getChild($uri, &$params = array(), &$matched = null)
     {
@@ -333,12 +339,13 @@ class Router extends Route
     /**
      * Build route uri
      *
-     * @throws \Exception Something goes wrong
-     * @param string rule
-     * @param string[] $params
+     * @param $rule
+     * @param array $params
+     * @param bool $addMissedToQuery
      * @return Url
+     * @throws \Exception Something goes wrong
      */
-    public static function BuildUri($rule, $params = array(), $addMissedToQuery = true)
+    public static function BuildUri($rule, $params = [], $addMissedToQuery = true)
     {
         static $Parsed = [];
 
@@ -347,7 +354,7 @@ class Router extends Route
             $Parsed[$index = $rule] = [];
             while ($index) {
                 if (preg_match('/^' . self::URL_VARIABLE_PATTERN . '/', $index, $matches)) {
-                    list($part, $mask, $reg, $key) = $matches;
+                    list($part, , , $key) = $matches;
 
                     $Parsed[$rule][] = [1, $key];
                     $index = substr($index, strlen($part));
@@ -399,7 +406,7 @@ class Router extends Route
     {
         $route = $this->getChild($uri, $params, $matched);
 
-        if ($route instanceof Route) {
+        if ($route instanceof Router) {
             $uri_obj = ($uri instanceof Url) ? $uri : new Url($uri);
             return $route->getMatched($uri_obj->getRelated($matched), $params);
         }
@@ -429,13 +436,13 @@ class Router extends Route
         $params = array();
 
         $matched = '';
-        if ($route = $this->getChild($request->getUrlPath(), $params, $matched)) {
+        if ($route = $this->getChild($request->getUrlPath(), $params, $matched) && $matched) {
             $subrequest = $request->subrequest($matched);
 
-            foreach($params as $name => $value) {
+            foreach ($params as $name => $value) {
                 $subrequest = $subrequest->withAttribute($name, $value);
             }
-            foreach($arguments as $name => $value) {
+            foreach ($arguments as $name => $value) {
                 $subrequest = $subrequest->withAttribute($name, $value);
             }
 
@@ -455,14 +462,22 @@ class Router extends Route
         $params = array();
         $route = $this->getMatched($uri, $params);
 
-        if ($route) {
-            $url = $route->uri($params)->__toString();
+        if ($route instanceof Route) {
+            $url = $this->uri($route, $params)->__toString();
             return $url;
         } else {
             return $uri;
         }
     }
 
+    /**
+     * Dispatch home(root) if no matched child found
+     *
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     * @throws \Exception
+     */
     protected function dispatchHome(Request $request, Response $response)
     {
         $look_for = $request->getUrl(false);
@@ -477,7 +492,9 @@ class Router extends Route
         }
 
         throw new \Exception(sprintf('No matched route found for %s app[%s], "%s" existed', $look_for, get_class($this),
-                implode(', ', $patterns)));
+            implode(', ', $patterns)));
+
+        return $response;
     }
 
     protected function find(callable $callback)
@@ -492,9 +509,11 @@ class Router extends Route
     /**
      * Build route uri
      *
-     * @param string rule
-     * @param string[] $params
+     * @param Route $route
+     * @param array $params
+     * @param bool $addMissedToQuery
      * @return Url
+     * @throws \Exception
      */
     public function uri(Route $route, $params = array(), $addMissedToQuery = true)
     {
