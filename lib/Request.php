@@ -77,11 +77,6 @@ class Request implements ServerRequestInterface
     private $_input;
 
     /**
-     * @var Request
-     */
-    private $_parent;
-
-    /**
      * @var Session
      */
     private $_session;
@@ -100,7 +95,7 @@ class Request implements ServerRequestInterface
      */
     private $_queryParams = [];
 
-    function __construct(
+    public function __construct(
         Url $baseUrl = null,
         Url $url,
         $method = self::METHOD_GET,
@@ -207,35 +202,12 @@ class Request implements ServerRequestInterface
         $base = $this->_baseUrl->resolve($base);
 
         $request = clone $this;
-        $request->_url = $url;//$this->_url->getRelated($base);
-        $request->_baseUrl = $base;//$this->_baseUrl->resolve($base);
+        $request->_url = $url;
+        $request->_baseUrl = $base;
         $request->_session = &$this->_session;
-        //$request->_sessions = &$this->_sessions;
         $request->_cookies = &$this->_cookies;
-        //$request->_parent = $this;
-
-        /*echo $base."\n";
-        echo $this->_url."\n";
-        echo $request->_baseUrl."\n";
-        echo $request->_url."\n";
-
-        die('createSubrequest');*/
-
 
         return $request;
-    }
-
-    /**
-     * @return Url
-     */
-    public function getTopBaseUri()
-    {
-        $request = $this;
-        do {
-            $base_uri = $request->_baseUrl;
-        } while ($request = $request->_parent);
-
-        return $base_uri;
     }
 
     /**
@@ -357,9 +329,9 @@ class Request implements ServerRequestInterface
     }
 
     /**
-     * @return unknown
+     * @return array
      */
-    public function getParams($names = null)
+    public function getParams()
     {
         $args = func_get_args();
         $names = array();
@@ -374,7 +346,7 @@ class Request implements ServerRequestInterface
         }
 
         if ($names) {
-            $return = array();
+            $return = [];
             foreach ($names as $name) {
                 $return[] = $this->getParam($name);
             }
