@@ -1,5 +1,6 @@
 {
     "name": "webmaniacs.net/lib-controller",
+    "minimum-stability": "dev",
     "license": "MIT",
     "authors": [
         {
@@ -23,7 +24,7 @@
     },
 
     "require": {
-        "webmaniacs.net/lib-uri": "~1.0",
+        "webmaniacs.net/lib-uri": "dev-master",
         "psr/http-message": "^0.9",
         "psr/log": "~1.0"
     },
