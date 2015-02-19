@@ -5,3 +5,4 @@ Usage
 -----
 
 Install the latest version with `composer require webmaniacs.net/lib-controller`
+
