@@ -24,7 +24,7 @@
     },
 
     "require": {
-        "webmaniacs.net/lib-uri": "dev-master",
+        "webmaniacs.net/lib-uri": "^0.9",
         "psr/http-message": "^0.9",
         "psr/log": "~1.0"
     },
