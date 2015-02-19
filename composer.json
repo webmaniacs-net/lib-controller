@@ -1,0 +1,35 @@
+{
+    "name": "webmaniacs.net/lib-controller",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Stas Dovgodko",
+            "email": "stas.dovgodko@webmaniacs.net"
+        }
+    ],
+    "keywords": [
+        "controller",
+        "routing"
+    ],
+
+    "autoload": {
+        "psr-4": {
+            "wmlib\\controller\\": "lib/"
+        }
+    },
+
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+
+    "require": {
+        "webmaniacs.net/lib-uri": "~1.0",
+        "psr/http-message": "~1.0",
+        "psr/log": "~1.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
