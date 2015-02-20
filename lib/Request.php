@@ -2,7 +2,6 @@
 namespace wmlib\controller;
 
 use Psr\Http\Message\StreamableInterface;
-use wmlib\controller\SessionStorage\Native;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 
@@ -64,7 +63,9 @@ class Request implements ServerRequestInterface
      */
     private $_version;
 
-    private $_params, $_files;
+    private $_params;
+
+    private $_files;
 
     /**
      * Request base URI
@@ -78,7 +79,7 @@ class Request implements ServerRequestInterface
     /**
      * @var Session
      */
-    private $_session;
+    private $session;
 
     /**
      * @var array
@@ -100,8 +101,7 @@ class Request implements ServerRequestInterface
         $method = self::METHOD_GET,
         $params = array(),
         $version = self::VERSION_1_1
-    )
-    {
+    ) {
         $this->_baseUrl = $baseUrl ? $baseUrl : new Url('');
         $this->_url = $url;
         $this->_method = $method;
@@ -118,32 +118,11 @@ class Request implements ServerRequestInterface
     }
 
     /**
-     * @return Session
+     * @return Session|null
      */
     public function getSession()
     {
-        if (!$this->_session) {
-            $sid = $this->getCookie(Response::SESSION_COOKIE_NAME);
-
-            //echo $sid;
-            $user_salt = substr(md5($this->getUserAgent()), 0, 5);
-            if ($sid) {
-                // validate
-                if (strpos($sid, $user_salt) === false) {
-                    $sid = null;
-                }
-            }
-
-            if (!$sid) {
-                $sid = $user_salt . md5(microtime(true) . rand(0, PHP_INT_MAX));
-            }
-
-            //echo $sid;
-
-            $this->_session = new Session($sid, new Native());
-        }
-
-        return $this->_session;
+        return $this->session;
     }
 
     /**
@@ -153,8 +132,8 @@ class Request implements ServerRequestInterface
      */
     public function hasSession()
     {
-        if ($this->_session) {
-            return $this->_session->isStarted();
+        if ($this->session) {
+            return $this->session->isStarted();
         } else {
             return false;
         }
@@ -163,9 +142,12 @@ class Request implements ServerRequestInterface
     /**
      * @param Session $session
      */
-    public function setSession(Session $session)
+    public function withSession(Session $session)
     {
-        $this->_session = $session;
+        $request = clone $this;
+        $request->session = $session;
+
+        return $request;
     }
 
 
@@ -204,7 +186,7 @@ class Request implements ServerRequestInterface
         $request = clone $this;
         $request->_url = $url;
         $request->_baseUrl = $base;
-        $request->_session = &$this->_session;
+        $request->session = &$this->session;
         $request->_cookies = &$this->_cookies;
 
         return $request;
@@ -235,7 +217,7 @@ class Request implements ServerRequestInterface
      */
     public function getCookies($names = array())
     {
-        if ($names) {
+        if (!empty($names)) {
             $return = [];
             foreach ($names as $name) {
                 $return[] = $this->getCookie($name);
@@ -267,17 +249,42 @@ class Request implements ServerRequestInterface
         $this->_baseUrl = $baseUrl;
     }
 
-
+    /**
+     * Get header string or NULL if not specified
+     * Name is case-insensitive
+     *
+     * @param string $name
+     * @return null|string
+     */
     public function getHeader($name)
     {
-        return implode(', ', $this->getHeaderLines($name));
+        $lines = $this->getHeaderLines($name);
+
+        if (!empty($lines)) {
+            return implode(', ', $lines);
+        } else {
+            return null;
+        }
+
     }
 
+    /**
+     * Get Content-type header string or NULL if not specified
+     *
+     * @return null|string
+     */
     public function getContentType()
     {
         return $this->getHeader(self::HEADER_CONTENT_TYPE);
     }
 
+    /**
+     * Check if header specified for request
+     * Name is case-insensitive
+     *
+     * @param string $name
+     * @return bool
+     */
     public function hasHeader($name)
     {
         foreach ($this->_headers as $k => $v) {
@@ -345,7 +352,7 @@ class Request implements ServerRequestInterface
             }
         }
 
-        if ($names) {
+        if (!empty($names)) {
             $return = [];
             foreach ($names as $name) {
                 $return[] = $this->getParam($name);
@@ -501,7 +508,9 @@ class Request implements ServerRequestInterface
     {
         $query = $this->getUrl(true)->getQuery();
         $params = [];
-        if ($query) parse_str($query, $params);
+        if ($query) {
+            parse_str($query, $params);
+        }
         return array_merge($params, $this->_queryParams);
     }
 

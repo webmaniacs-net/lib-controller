@@ -40,8 +40,6 @@ class Response implements ResponseInterface
     const HEADER_CACHE_CONTROL = 'Cache-Control';
     const HEADER_PRAGMA = 'Pragma';
 
-    const SESSION_COOKIE_NAME = 'sid';
-
     /**
      * @var int
      */

@@ -170,7 +170,9 @@ class Url implements UriInterface
                 /** @var $uri2 Url */
                 $uri2->scheme = $this->scheme;
                 $uri2->schemeSpecificPart = $this->schemeSpecificPart;
-                if ($this->authority) $uri2->setAuthority($this->authority);
+                if ($this->authority) {
+                    $uri2->setAuthority($this->authority);
+                }
 
                 $uri2->path = $this->path;
                 $uri2->fragment = $uri->fragment;
@@ -502,7 +504,6 @@ class Url implements UriInterface
     }
 
 
-
     /**
      * Returns the content of this URI as a string.
      *
@@ -551,7 +552,7 @@ class Url implements UriInterface
      * @throws \DomainException
      * @return Url
      */
-    public function setAuthority($authority)
+    protected function setAuthority($authority)
     {
         $aparts = [];
         if (preg_match('/^(([^\@]+)\@)?(.*?)(\:(.+))?$/S', $authority, $aparts)) {
@@ -607,20 +608,6 @@ class Url implements UriInterface
         return urldecode($this->query);
     }
 
-
-    /**
-     * Sets the query component of this URI.
-     *
-     * @param string $query The query component of URI
-     */
-    public function setQuery($query)
-    {
-        $this->query = $query;
-
-        $this->hash = null;
-
-        return $this;
-    }
 
     /**
      * Returns the scheme component of this URI.
@@ -732,21 +719,6 @@ class Url implements UriInterface
     }
 
     /**
-     * Set host
-     *
-     * @param string $host
-     * @return Url Fluent API support
-     */
-    public function setHost($host)
-    {
-        $this->host = $host;
-
-        $this->hash = null;
-
-        return $this;
-    }
-
-    /**
      * Returns the port number of this URI.
      *
      * @return string The port component of this URI, or null if the port is undefined
@@ -754,21 +726,6 @@ class Url implements UriInterface
     public function getPort()
     {
         return $this->port;
-    }
-
-    /**
-     * Set port
-     *
-     * @param string $port
-     * @return Url Fluent API support
-     */
-    public function setPort($port)
-    {
-        $this->port = $port;
-
-        $this->hash = null;
-
-        return $this;
     }
 
     /**
@@ -918,7 +875,9 @@ class Url implements UriInterface
     public function withHost($host)
     {
         $url = clone $this;
-        $url->setHost($host);
+        $url->host = $host;
+
+        $url->hash = null;
 
         return $url;
     }
@@ -943,7 +902,8 @@ class Url implements UriInterface
     public function withPort($port)
     {
         $url = clone $this;
-        $url->withPort($port);
+        $url->port = $port;
+        $url->hash = null;
 
         return $url;
     }
@@ -990,7 +950,8 @@ class Url implements UriInterface
     public function withQuery($query)
     {
         $url = clone $this;
-        $url->setQuery($query);
+        $url->query = $query;
+        $url->hash = null;
 
         return $url;
     }

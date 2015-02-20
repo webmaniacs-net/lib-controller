@@ -1,6 +1,8 @@
 <?php
 namespace wmlib\controller;
 
+use wmlib\controller\SessionStorage\Native;
+
 class Session
 {
     private $_id;
