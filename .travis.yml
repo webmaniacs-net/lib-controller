@@ -10,7 +10,7 @@ before_script:
 
 script:
   - composer update
-  - ./vendor/bin/phpunit --coverage-clover coverage.clover; ./tests/;
+  - ./vendor/bin/phpunit --coverage-clover coverage.clover ./tests/;
   #- ./vendor/bin/phpcs --standard=PSR2 ./src/ ./tests/;
   #- if [[ $TRAVIS_PHP_VERSION != '5.3.3' && $TRAVIS_PHP_VERSION != '5.4.29' && $TRAVIS_PHP_VERSION != '5.5.13' ]]; then php -n ./vendor/bin/athletic -p ./tests/DoctrineTest/InstantiatorPerformance/ -f GroupedFormatter; fi
 
