@@ -7,7 +7,7 @@ use wmlib\controller\Request;
 use wmlib\controller\Response;
 use wmlib\controller\Route;
 use wmlib\controller\Router;
-use wmlib\uri\Url;
+use wmlib\controller\Url;
 
 class LeafRouteMock extends Route
 {
