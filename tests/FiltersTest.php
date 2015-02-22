@@ -91,4 +91,19 @@ class FiltersTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals(['pre:1','pre:2','post:2','post:1'], FilterMock::$FILTERS);
     }
+
+    public function testChainRoute()
+    {
+        FilterMock::$FILTERS = [];
+        $route = new RouteMock();
+        $route->addFilter(new FilterMock(1));
+        $route->addFilter(new FilterMock(2));
+        $route->addFilter(new FilterMock(3));
+
+        $r = new Request(null, new Url('/'));
+
+        $route->dispatch($r, new Response($r));
+
+        $this->assertEquals(['pre:1','pre:2','pre:3','post:3','post:2','post:1'], FilterMock::$FILTERS);
+    }
 }
