@@ -25,7 +25,7 @@ abstract class Route implements LoggerAwareInterface
      *
      * @var string[]
      */
-    protected $default = array(), $properties = array();
+    protected $default = [], $properties = array();
 
     protected function __construct()
     {
@@ -75,7 +75,7 @@ abstract class Route implements LoggerAwareInterface
      * @param string[] $default
      * @return self
      */
-    public function setDefault($default)
+    public function setDefault(array $default)
     {
         $this->default = $default;
         return $this;

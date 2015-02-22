@@ -40,7 +40,7 @@ class RootRouterMock extends Router
 
             $this->addRoute('path3/', new RootRouterMock('r4', function() {
                 $this->addRoute('path1', new LeafRouteMock('l4_1'), 'name4_1');
-                $this->addRoute('path2', new LeafRouteMock('l4_2'), 'name4_2');
+                $this->addRoute('path2/:k2', new LeafRouteMock('l4_2'), 'name4_2')->addDefault('k2', 'v2');
             }), 'name4');
         });
 
@@ -116,12 +116,30 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     }
 
 
-    public function testGetUrl()
+    public function testUri()
     {
         $root = new RootRouterMock('root');
         $route =$root->getRoute('name4_2');
 
 
-        $this->assertEquals('path3/path2', (string)$root->uri($route)); // ro to shilds deep
+        $this->assertEquals('path3/path2/v2', (string)$root->uri($route)); // ro to shilds deep
+    }
+
+    public function testUrl()
+    {
+        $root = new RootRouterMock('root');
+
+
+        $this->assertEquals('path3/path2/v2', (string)$root->url('path3/path2'));
+    }
+
+    public function testHasRoute()
+    {
+        $root = new RootRouterMock('root');
+
+
+        $this->assertEquals(true, $root->hasRoute('name2'));
+        $this->assertEquals(false, $root->hasRoute('name_x'));
+        $this->assertEquals(false, $root->hasRoute('name4_1'));
     }
 }

@@ -22,7 +22,7 @@ class Factory
             /**
              * Add Ajax modifier
              */
-            $redirect_uri->pushQueryValue('ajax', 'yes');
+            $redirect_uri = $redirect_uri->withQueryValue('ajax', 'yes');
         }
 
         return $response

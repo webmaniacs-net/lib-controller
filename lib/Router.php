@@ -396,7 +396,7 @@ class Router extends Route
         $uri = new Url(implode(self::URI_DELIMITER, $parts));
 
         if ((sizeof($missed) > 0) && $addMissedToQuery) {
-            $uri->pushQueryValues($missed);
+            $uri = $uri->withQueryValues($missed);
         }
 
         return $uri;
