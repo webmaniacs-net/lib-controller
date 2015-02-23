@@ -20,20 +20,23 @@ use wmlib\controller\Stream\String;
 class Middleware extends Filter
 {
     /**
-     * @var HttpKernelInterface
+     * @var HttpKernelInterface|null
      */
-    private $middleware;
-
-    private $exclusive;
+    private $beforeMiddleware;
 
     /**
-     * @param HttpKernelInterface $middleware
-     * @param bool $exclusive True is filter should use middleware response in ex way and pass all next's filters and route
+     * @var HttpKernelInterface|null
      */
-    public function __construct(HttpKernelInterface $middleware, $exclusive = true)
+    private $afterMiddleware;
+
+    /**
+     * @param HttpKernelInterface $beforeMiddleware or null
+     * @param HttpKernelInterface $afterMiddleware or null
+     */
+    public function __construct(HttpKernelInterface $beforeMiddleware = null, HttpKernelInterface $afterMiddleware = null)
     {
-        $this->middleware = $middleware;
-        $this->exclusive = $exclusive;
+        $this->beforeMiddleware = $beforeMiddleware;
+        $this->afterMiddleware = $afterMiddleware;
     }
 
     /**
@@ -51,14 +54,43 @@ class Middleware extends Filter
      */
     public function doPreFilter(Request $request, Response $response, Chain $filterChain)
     {
-        $symphony_response = $this->middleware->handle($this->decorateRequest($request), HttpKernelInterface::MASTER_REQUEST, false);
+        if ($this->beforeMiddleware !== null) {
+            $symphony_response = $this->beforeMiddleware->handle($this->decorateRequest($request), HttpKernelInterface::MASTER_REQUEST, false);
 
-        $response = $this->mergeResponse($response, $symphony_response);
+            $response = $this->mergeResponse($response, $symphony_response);
 
-        if ($this->exclusive) {
             return $response;
+        } else {
+            return $filterChain->doPreFilter($request, $response);
         }
-        return $filterChain->doPreFilter($request, $response);
+    }
+
+    /**
+     * Post filter method.
+     * This should be redefined in post filter.
+     *
+     * For process the rest of filter chain this code should be call inside:
+     * <code>
+     * $filterChain->doPostFilter ();
+     * </code>
+     *
+     * @param Request $request
+     * @param Response $response
+     * @param Chain $filterChain
+     * @param bool $flag
+     * @return Response|void
+     */
+    public function doPostFilter(Request $request, Response $response, Chain $filterChain, $flag = true)
+    {
+        if ($this->afterMiddleware !== null) {
+            $symphony_response = $this->afterMiddleware->handle($this->decorateRequest($request), HttpKernelInterface::MASTER_REQUEST, false);
+
+            $response = $this->mergeResponse($response, $symphony_response);
+
+            return $response;
+        } else {
+            return $filterChain->doPostFilter($request, $response, $flag);
+        }
     }
 
     /**
