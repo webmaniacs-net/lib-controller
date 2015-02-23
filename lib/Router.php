@@ -436,7 +436,7 @@ class Router extends Route
         $params = array();
 
         $matched = '';
-        if ($route = $this->getChild($request->getUrlPath(), $params, $matched) && $matched) {
+        if (($route = $this->getChild($request->getUrlPath(), $params, $matched)) && $matched) {
             $subrequest = $request->subrequest($matched);
 
             foreach ($params as $name => $value) {
