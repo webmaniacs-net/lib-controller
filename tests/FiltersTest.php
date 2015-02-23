@@ -40,7 +40,7 @@ class FilterMock extends Filter
 
     public function doPreFilter(Request $request, Response $response, Chain $filterChain)
     {
-        self::$FILTERS[] = 'pre:'.$this->id;
+        self::$FILTERS[] = 'pre:' . $this->id;
 
         if (!$this->last) {
             return $filterChain->doPreFilter($request, $response);
@@ -49,14 +49,14 @@ class FilterMock extends Filter
 
     public function doPostFilter(Request $request, Response $response, Chain $filterChain, $flag = true)
     {
-        self::$FILTERS[] = 'post:'.$this->id;
+        self::$FILTERS[] = 'post:' . $this->id;
         return $filterChain->doPostFilter($request, $response, $flag);
     }
 }
 
 
-
-class FiltersTest extends \PHPUnit_Framework_TestCase {
+class FiltersTest extends \PHPUnit_Framework_TestCase
+{
 
     public function testChain()
     {
@@ -69,10 +69,10 @@ class FiltersTest extends \PHPUnit_Framework_TestCase {
 
         $r = new Request(null, new Url('/'));
 
-        $chain->doPreFilter($r, new Response($r) );
-        $chain->doPostFilter($r, new Response($r) );
+        $chain->doPreFilter($r, new Response($r));
+        $chain->doPostFilter($r, new Response($r));
 
-        $this->assertEquals(['pre:1','pre:2','pre:3','post:3','post:2','post:1'], FilterMock::$FILTERS);
+        $this->assertEquals(['pre:1', 'pre:2', 'pre:3', 'post:3', 'post:2', 'post:1'], FilterMock::$FILTERS);
     }
 
     public function testChainSkeep()
@@ -86,10 +86,10 @@ class FiltersTest extends \PHPUnit_Framework_TestCase {
 
         $r = new Request(null, new Url('/'));
 
-        $chain->doPreFilter($r, new Response($r) );
-        $chain->doPostFilter($r, new Response($r) );
+        $chain->doPreFilter($r, new Response($r));
+        $chain->doPostFilter($r, new Response($r));
 
-        $this->assertEquals(['pre:1','pre:2','post:2','post:1'], FilterMock::$FILTERS);
+        $this->assertEquals(['pre:1', 'pre:2', 'post:2', 'post:1'], FilterMock::$FILTERS);
     }
 
     public function testChainRoute()
@@ -104,6 +104,6 @@ class FiltersTest extends \PHPUnit_Framework_TestCase {
 
         $route->dispatch($r, new Response($r));
 
-        $this->assertEquals(['pre:1','pre:2','pre:3','post:3','post:2','post:1'], FilterMock::$FILTERS);
+        $this->assertEquals(['pre:1', 'pre:2', 'pre:3', 'post:3', 'post:2', 'post:1'], FilterMock::$FILTERS);
     }
 }

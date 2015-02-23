@@ -29,7 +29,8 @@ class Middleware implements HttpKernelInterface
      * @param HttpKernelInterface $next The next application the request will be forwarded to if not handled by this
      * @param Router $router Router to handle
      */
-    public function __construct(HttpKernelInterface $next, Router $router) {
+    public function __construct(HttpKernelInterface $next, Router $router)
+    {
         $this->next = $next;
         $this->router = $router;
     }

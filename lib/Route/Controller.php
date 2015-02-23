@@ -180,7 +180,8 @@ class Controller extends Route
         Request $request,
         Response $response,
         array $arguments = []
-    ) {
+    )
+    {
         $param_name = $param->getName();
 
         /* @var $param \ReflectionParameter */
@@ -219,7 +220,8 @@ class Controller extends Route
         Request $request,
         Response $response,
         array $arguments = []
-    ) {
+    )
+    {
         /**
          * Create view
          */

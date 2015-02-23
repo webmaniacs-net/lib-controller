@@ -33,12 +33,12 @@ class RootRouterMock extends Router
 
     public function __construct($id = null, callable $callback = null)
     {
-        parent::__construct($callback ? $callback : function() {
+        parent::__construct($callback ? $callback : function () {
             $this->addRoute('path1', new LeafRouteMock('l1'), 'name1');
             $this->addRoute('path2', new LeafRouteMock('l2'), 'name2');
             $this->addRoute('path/path3', new LeafRouteMock('l3'), 'name3');
 
-            $this->addRoute('path3/', new RootRouterMock('r4', function() {
+            $this->addRoute('path3/', new RootRouterMock('r4', function () {
                 $this->addRoute('path1', new LeafRouteMock('l4_1'), 'name4_1');
                 $this->addRoute('path2/:k2', new LeafRouteMock('l4_2'), 'name4_2')->addDefault('k2', 'v2');
             }), 'name4');
@@ -61,7 +61,8 @@ class RootRouterMock extends Router
     }
 }
 
-class RouterTest extends \PHPUnit_Framework_TestCase {
+class RouterTest extends \PHPUnit_Framework_TestCase
+{
 
     public function testInit()
     {
@@ -119,7 +120,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase {
     public function testUri()
     {
         $root = new RootRouterMock('root');
-        $route =$root->getRoute('name4_2');
+        $route = $root->getRoute('name4_2');
 
 
         $this->assertEquals('path3/path2/v2', (string)$root->uri($route)); // ro to shilds deep

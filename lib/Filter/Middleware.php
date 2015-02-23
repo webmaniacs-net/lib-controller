@@ -83,7 +83,7 @@ class Middleware extends Filter
      */
     private function mergeResponse(Response $response, SymfonyResponse $symfonyResponse)
     {
-        foreach($symfonyResponse->headers as $header => $line) {
+        foreach ($symfonyResponse->headers as $header => $line) {
             $response = $response->withHeader($header, $line);
         }
         $response = $response->withBody(new String($symfonyResponse->getContent()));

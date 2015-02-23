@@ -101,7 +101,8 @@ class Request implements ServerRequestInterface
         $method = self::METHOD_GET,
         $params = array(),
         $version = self::VERSION_1_1
-    ) {
+    )
+    {
         $this->_baseUrl = $baseUrl ? $baseUrl : new Url('');
         $this->_url = $url;
         $this->_method = $method;
