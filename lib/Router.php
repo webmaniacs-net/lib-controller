@@ -2,6 +2,8 @@
 namespace wmlib\controller;
 
 
+use wmlib\controller\Exception\RouteNotFoundException;
+
 class Router extends Route
 {
     const URI_DELIMITER = '/';
@@ -476,7 +478,7 @@ class Router extends Route
      * @param Request $request
      * @param Response $response
      * @return Response
-     * @throws \Exception
+     * @throws RouteNotFoundException
      */
     protected function dispatchHome(Request $request, Response $response)
     {
@@ -491,7 +493,7 @@ class Router extends Route
             }
         }
 
-        throw new \Exception(sprintf('No matched route found for %s app[%s], "%s" existed', $look_for, get_class($this),
+        throw new RouteNotFoundException(sprintf('No matched route found for %s app[%s], "%s" existed', $look_for, get_class($this),
             implode(', ', $patterns)));
 
         return $response;
