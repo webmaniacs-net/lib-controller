@@ -23,6 +23,10 @@
         "phpunit/phpunit": "~4.0"
     },
 
+    "suggest": {
+        "symfony/http-kernel": "Allows to use HttpKernelInterface middlewares as filter"
+    },
+
     "require": {
         "psr/http-message": "~0.9",
         "webmaniacs.net/lib-uri": "~1.0",
