@@ -39,6 +39,9 @@ class Router extends Route
     final protected function _initialize()
     {
         if (!$this->_initialized) {
+
+            $this->init();
+
             if (($this->_callback !== null) && is_callable($this->_callback)) {
                 if ($this->_callback instanceof \Closure) {
                     call_user_func_array($this->_callback->bindTo($this), array($this));
@@ -47,7 +50,7 @@ class Router extends Route
                 }
             }
 
-            $this->init();
+
 
             $this->_initialized = true;
         }
