@@ -585,6 +585,21 @@ class Request implements ServerRequestInterface
     }
 
     /**
+     * Check a single derived request attribute.
+     *
+     * Check for exists a single derived request attribute as described in
+     * getAttributes().
+     *
+     * @see getAttributes()
+     * @param string $attribute Attribute name.
+     * @return bool
+     */
+    public function hasAttribute($attribute)
+    {
+        return (isset($this->_attributes[$attribute]));
+    }
+
+    /**
      * Gets the body of the message.
      *
      * @return StreamableInterface|null Returns the body, or null if not set.

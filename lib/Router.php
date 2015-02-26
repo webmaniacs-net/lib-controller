@@ -417,7 +417,7 @@ class Router extends Route
     }
 
     /**
-     * @return Route[]
+     * @return \SplObjectStorage
      */
     public function getRoutes()
     {

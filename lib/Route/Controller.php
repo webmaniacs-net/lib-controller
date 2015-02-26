@@ -1,6 +1,7 @@
 <?php
 namespace wmlib\controller\Route;
 
+use wmlib\controller\Exception\PropertyNotFoundException;
 use wmlib\controller\IResponseDecorator;
 use wmlib\controller\Request;
 use wmlib\controller\Response;
@@ -175,44 +176,27 @@ class Controller extends Route
         }
     }
 
+    /**
+     * @param string $param_name
+     * @param Request $request
+     * @param array $arguments
+     * @return mixed
+     * @throws PropertyNotFoundException
+     */
     protected function _prepareMethodParam(
-        \ReflectionParameter $param,
+        $param_name,
         Request $request,
-        Response $response,
         array $arguments = []
     )
     {
-        $param_name = $param->getName();
 
-        /* @var $param \ReflectionParameter */
-        if ($param_class = $param->getClass()) {
-            switch ($param_class->getName()) {
-                case self::CLASS:
-                    return $this;
-                case Response::CLASS:
-                    return $response;
-                case Request::CLASS:
-                    return $request;
-            }
-        }
-
-        $request_value = isset($arguments[$param_name]) ? $arguments[$param_name] : $request->getAttribute($param_name,
-            $param->isOptional() ? $param->getDefaultValue() : null);
-
-        if ($request_value === null && !$param->isDefaultValueAvailable()) {
-            throw new \Exception("Required action property $param_name not specified");
-        } elseif ($param->isOptional() && ($default = $param->getDefaultValue())) {
-            if (is_int($default)) {
-                return (int)($request_value);
-            } elseif (is_bool($default)) {
-                return (bool)($request_value);
-            } else {
-                return $request_value;
-            }
+        if (isset($arguments[$param_name])) {
+            return $arguments[$param_name];
+        } elseif ($request->hasAttribute($param_name)) {
+            return $request->getAttribute($param_name);
         } else {
-            return $request_value;
+            throw new PropertyNotFoundException("Controller action argument $param_name not found");
         }
-
     }
 
     protected function _dispatchMethod(
@@ -230,8 +214,38 @@ class Controller extends Route
         foreach ($method->getParameters() as $param) {
             $param_name = $param->getName();
 
-            $signature[$param_name] = $this->_prepareMethodParam($param, $request, $response, $arguments);
+            /* @var $param \ReflectionParameter */
+            if ($param_class = $param->getClass()) {
+                switch ($param_class->getName()) {
+                    case self::CLASS:
+                        $signature[$param_name] = $this;
+                        continue 2;
+                    case Response::CLASS:
+                        $signature[$param_name] = $response;
+                        continue 2;
+                    case Request::CLASS:
+                        $signature[$param_name] = $request;
+                        continue 2;
+                }
+            }
 
+            $value = null;
+            try {
+                $value = $this->_prepareMethodParam($param_name, $request, $arguments);
+            } catch (PropertyNotFoundException $e) {
+                if ($param->isOptional()) $value = $param->getDefaultValue();
+                else throw $e;
+            }
+
+            if ($param->isOptional() && ($default = $param->getDefaultValue()) !== null) {
+                if (is_int($default)) {
+                    $value = (int)($value);
+                } elseif (is_bool($default)) {
+                    $value = (bool)($value);
+                }
+            }
+
+            $signature[$param_name] = $value;
         }
 
         return $method->invokeArgs($this->controller, $signature);

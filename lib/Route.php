@@ -18,7 +18,7 @@ abstract class Route implements LoggerAwareInterface
      *
      * @var Chain
      */
-    private $filterChain;
+    protected $filterChain;
 
     /**
      * Params default
