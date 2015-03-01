@@ -42,6 +42,7 @@ class Url extends Uri
      */
     public function withQueryValues(array $values)
     {
+
         if ($this->query !== null) {
             parse_str($this->query, $data);
         } else {
@@ -49,7 +50,7 @@ class Url extends Uri
         }
 
         $uri = clone $this;
-        $uri->query = http_build_query($values + $data);
+        $uri->query = http_build_query(array_merge($data, $values));
 
         return $uri;
     }
