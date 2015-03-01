@@ -101,7 +101,10 @@ abstract class Route implements LoggerAwareInterface
     /**
      * Dispatch request to application
      *
-     *
+     * @param Request $request
+     * @param Response $response
+     * @param array $arguments
+     * @return Response
      */
     final public function dispatch(Request $request, Response $response, array $arguments = [])
     {

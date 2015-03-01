@@ -22,7 +22,9 @@ class Factory
             /**
              * Add Ajax modifier
              */
-            $redirect_uri = $redirect_uri->withQueryValue('ajax', 'yes');
+            $params = $request->getQueryParams();
+            $params['ajax'] = 'yes';
+            $redirect_uri = $redirect_uri->withQuery(http_build_query($params));
         }
 
         return $response

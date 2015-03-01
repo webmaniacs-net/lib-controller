@@ -45,6 +45,8 @@ class FilterMock extends Filter
         if (!$this->last) {
             return $filterChain->doPreFilter($request, $response);
         }
+
+        return null;
     }
 
     public function doPostFilter(Request $request, Response $response, Chain $filterChain, $flag = true)
@@ -67,7 +69,7 @@ class FiltersTest extends \PHPUnit_Framework_TestCase
         $chain->addFilter(new FilterMock(2));
         $chain->addFilter(new FilterMock(3));
 
-        $r = new Request(null, new Url('/'));
+        $r = new Request(new Url('/'));
 
         $chain->doPreFilter($r, new Response($r));
         $chain->doPostFilter($r, new Response($r));
@@ -84,7 +86,7 @@ class FiltersTest extends \PHPUnit_Framework_TestCase
         $chain->addFilter(new FilterMock(2, true));
         $chain->addFilter(new FilterMock(3));
 
-        $r = new Request(null, new Url('/'));
+        $r = new Request(new Url('/'));
 
         $chain->doPreFilter($r, new Response($r));
         $chain->doPostFilter($r, new Response($r));
@@ -100,7 +102,7 @@ class FiltersTest extends \PHPUnit_Framework_TestCase
         $route->addFilter(new FilterMock(2));
         $route->addFilter(new FilterMock(3));
 
-        $r = new Request(null, new Url('/'));
+        $r = new Request(new Url('/'));
 
         $route->dispatch($r, new Response($r));
 

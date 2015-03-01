@@ -15,7 +15,7 @@ class Request implements ServerRequestInterface
     const VERSION_1_1 = 1.1;
     const VERSION_0_9 = 0.9;
 
-    private $_attributes = [];
+    private $attributes = [];
 
     const EVENT_START_SESSION = 'start-session';
     const SESSION_NAMESPACE_PERSIST = 'persist';
@@ -40,41 +40,41 @@ class Request implements ServerRequestInterface
      *
      * @var string[]
      */
-    private $_headers;
+    private $headers;
 
     /**
      * Request URL
      *
      * @var Url
      */
-    private $_url;
+    private $url;
 
     /**
      * Request method
      *
      * @var string
      */
-    private $_method;
+    private $method;
 
     /**
      * Request version
      *
      * @var float
      */
-    private $_version;
+    private $version;
 
-    private $_params;
+    private $params;
 
-    private $_files;
+    private $files;
 
     /**
      * Request base URI
      *
      * @var Url
      */
-    private $_baseUrl;
+    private $baseUrl;
 
-    private $_input;
+    private $input;
 
     /**
      * @var Session
@@ -84,38 +84,43 @@ class Request implements ServerRequestInterface
     /**
      * @var array
      */
-    private $_cookies;
+    private $cookies;
 
     /**
      * @var array
      */
-    private $_parsedBody;
+    private $parsedBody;
     /**
      * @var array
      */
-    private $_queryParams = [];
+    private $queryParams = [];
 
+    /**
+     * @param Url $url
+     * @param string $method
+     * @param array $params
+     * @param float $version
+     */
     public function __construct(
-        Url $baseUrl = null,
         Url $url,
         $method = self::METHOD_GET,
-        $params = array(),
+        $params = [],
         $version = self::VERSION_1_1
     )
     {
-        $this->_baseUrl = $baseUrl ? $baseUrl : new Url('');
-        $this->_url = $url;
-        $this->_method = $method;
-        $this->_version = (float)$version;
+        $this->baseUrl = new Url('');
+        $this->url = $url;
+        $this->method = $method;
+        $this->version = (float)$version;
 
-        $this->_headers = array();
-        $this->_params = $params;
+        $this->headers = [];
+        $this->params = $params;
 
-        $this->_cookies = [];
+        $this->cookies = [];
 
-        $this->_files = array();
+        $this->files = [];
 
-        $this->_input = '';
+        $this->input = '';
     }
 
     /**
@@ -142,6 +147,7 @@ class Request implements ServerRequestInterface
 
     /**
      * @param Session $session
+     * @return Request
      */
     public function withSession(Session $session)
     {
@@ -159,36 +165,41 @@ class Request implements ServerRequestInterface
 
     public function setInput($input)
     {
-        $this->_input = $input;
+        $this->input = $input;
 
         return $this;
     }
 
     public function getInput()
     {
-        if (is_resource($this->_input)) {
+        if (is_resource($this->input)) {
             $input = '';
-            while (!feof($this->_input)) {
-                $input .= fgets($this->_input, 4096);
+            while (!feof($this->input)) {
+                $input .= fgets($this->input, 4096);
             }
-            fclose($this->_input);
+            fclose($this->input);
 
-            $this->_input = $input;
+            $this->input = $input;
         }
 
-        return $this->_input;
+        return $this->input;
     }
 
-    public function subrequest(Url $base)
+    /**
+     * @param Url $base
+     *
+     * @return Request
+     */
+    public function withBaseUrl(Url $base)
     {
-        $url = $this->_url->getRelated($base);
-        $base = $this->_baseUrl->resolve($base);
+        $url = $this->url->getRelated($base);
+        $base = $this->baseUrl->resolve($base);
 
         $request = clone $this;
-        $request->_url = $url;
-        $request->_baseUrl = $base;
+        $request->url = $url;
+        $request->baseUrl = $base;
         $request->session = &$this->session;
-        $request->_cookies = &$this->_cookies;
+        $request->cookies = &$this->cookies;
 
         return $request;
     }
@@ -203,20 +214,26 @@ class Request implements ServerRequestInterface
      */
     public function getCookie($name, $default = null)
     {
-        return (isset($this->_cookies[$name])) ? $this->_cookies[$name] : $default;
+        return (isset($this->cookies[$name])) ? $this->cookies[$name] : $default;
 
     }
 
     public function isXHR()
     {
-        return ($this->hasHeader(self::HEADER_X_REQUESTED_WITH) || ($this->hasParam('ajax') && $this->getParam('ajax')));
+        return (
+            $this->hasHeader(self::HEADER_X_REQUESTED_WITH)
+            || ($this->hasParam('ajax') && $this->getParam('ajax'))
+        );
     }
 
 
     /**
+     * Get request cookie values
+     *
+     * @param array $names
      * @return array
      */
-    public function getCookies($names = array())
+    public function getCookies($names = [])
     {
         if (!empty($names)) {
             $return = [];
@@ -226,7 +243,7 @@ class Request implements ServerRequestInterface
             return $return;
         } else {
             $return = [];
-            foreach ($this->_cookies as $name => $value) {
+            foreach ($this->cookies as $name => $value) {
                 $return[$name] = $value;
             }
             return $return;
@@ -239,15 +256,7 @@ class Request implements ServerRequestInterface
      */
     public function getBaseUrl()
     {
-        return $this->_baseUrl;
-    }
-
-    /**
-     * @param Url $baseUrl
-     */
-    public function setBaseUrl($baseUrl)
-    {
-        $this->_baseUrl = $baseUrl;
+        return $this->baseUrl;
     }
 
     /**
@@ -288,7 +297,7 @@ class Request implements ServerRequestInterface
      */
     public function hasHeader($name)
     {
-        foreach ($this->_headers as $k => $v) {
+        foreach ($this->headers as $k => $v) {
             if (strtolower($k) === strtolower($name)) {
                 return true;
             }
@@ -301,7 +310,7 @@ class Request implements ServerRequestInterface
      */
     public function getHeaders()
     {
-        return $this->_headers;
+        return $this->headers;
     }
 
     /**
@@ -309,18 +318,19 @@ class Request implements ServerRequestInterface
      */
     public function getMethod()
     {
-        return $this->_method;
+        return $this->method;
     }
 
     /**
+     * @param bool $full
      * @return Url
      */
     public function getUrl($full = false)
     {
         if ($full) {
-            return $this->_url->__toString() ? $this->_baseUrl->resolve($this->_url) : $this->_baseUrl;
+            return $this->url->__toString() ? $this->baseUrl->resolve($this->url) : $this->baseUrl;
         }
-        return $this->_url;
+        return $this->url;
     }
 
     /**
@@ -328,7 +338,7 @@ class Request implements ServerRequestInterface
      */
     public function getUrlPath()
     {
-        return $this->_url->getPath();
+        return $this->url->getPath();
     }
 
     public function getFullUri()
@@ -360,7 +370,7 @@ class Request implements ServerRequestInterface
             }
             return $return;
         } else {
-            return $this->_params;
+            return $this->params;
         }
     }
 
@@ -371,7 +381,7 @@ class Request implements ServerRequestInterface
      */
     public function isPost()
     {
-        return (strtoupper($this->_method) === self::METHOD_POST);
+        return (strtoupper($this->method) === self::METHOD_POST);
     }
 
     /**
@@ -385,8 +395,8 @@ class Request implements ServerRequestInterface
      */
     public function getParam($name, $default = null)
     {
-        if (isset($this->_params[$name])) {
-            return $this->_params[$name];
+        if (isset($this->params[$name])) {
+            return $this->params[$name];
         } else {
             return $default;
         }
@@ -402,7 +412,7 @@ class Request implements ServerRequestInterface
      */
     public function hasParam($name)
     {
-        return (isset($this->_params[$name]));
+        return (isset($this->params[$name]));
     }
 
     /**
@@ -413,8 +423,8 @@ class Request implements ServerRequestInterface
      */
     public function isCheckModifiedSince($time)
     {
-        if (isset($this->_headers[self::HEADER_IF_MODIFIED_SINCE])) {
-            $since = trim($this->_headers[self::HEADER_IF_MODIFIED_SINCE]);
+        if (isset($this->headers[self::HEADER_IF_MODIFIED_SINCE])) {
+            $since = trim($this->headers[self::HEADER_IF_MODIFIED_SINCE]);
 
             if ($pos = strpos($since, ';')) {
                 $since = substr($since, 0, $pos);
@@ -436,8 +446,8 @@ class Request implements ServerRequestInterface
      */
     public function isCheckNotContain($hash)
     {
-        if (isset($this->_headers[self::HEADER_IF_NONE_MATCH])) {
-            $inm = explode(",", $this->_headers[self::HEADER_IF_NONE_MATCH]);
+        if (isset($this->headers[self::HEADER_IF_NONE_MATCH])) {
+            $inm = explode(",", $this->headers[self::HEADER_IF_NONE_MATCH]);
 
             foreach ($inm as $i) {
                 if (trim($i) === $hash) {
@@ -451,7 +461,7 @@ class Request implements ServerRequestInterface
 
     public function __toString()
     {
-        return (string)$this->_baseUrl->resolve($this->_url);
+        return (string)$this->baseUrl->resolve($this->url);
     }
 
 
@@ -484,7 +494,7 @@ class Request implements ServerRequestInterface
     public function getCookieParams()
     {
         $return = [];
-        foreach ($this->_cookies as $name => $value) {
+        foreach ($this->cookies as $name => $value) {
             $return[$name] = $value;
         }
         return $return;
@@ -512,7 +522,7 @@ class Request implements ServerRequestInterface
         if ($query) {
             parse_str($query, $params);
         }
-        return array_merge($params, $this->_queryParams);
+        return array_merge($params, $this->queryParams);
     }
 
     /**
@@ -560,7 +570,7 @@ class Request implements ServerRequestInterface
      */
     public function getAttributes()
     {
-        return $this->_attributes;
+        return $this->attributes;
     }
 
     /**
@@ -577,8 +587,8 @@ class Request implements ServerRequestInterface
      */
     public function getAttribute($attribute, $default = null)
     {
-        if (isset($this->_attributes[$attribute])) {
-            return $this->_attributes[$attribute];
+        if (isset($this->attributes[$attribute])) {
+            return $this->attributes[$attribute];
         } else {
             return $default;
         }
@@ -596,7 +606,7 @@ class Request implements ServerRequestInterface
      */
     public function hasAttribute($attribute)
     {
-        return (isset($this->_attributes[$attribute]));
+        return (isset($this->attributes[$attribute]));
     }
 
     /**
@@ -646,7 +656,7 @@ class Request implements ServerRequestInterface
     {
 
         $request = clone $this;
-        $request->_method = $method;
+        $request->method = $method;
 
         return $request;
     }
@@ -685,8 +695,8 @@ class Request implements ServerRequestInterface
         }
 
         $request = clone $this;
-        $request->_baseUrl = null;
-        $request->_url = $url;
+        $request->baseUrl = null;
+        $request->url = $url;
 
         return $request;
     }
@@ -707,7 +717,7 @@ class Request implements ServerRequestInterface
     public function withProtocolVersion($version)
     {
         $request = clone $this;
-        $request->_version = (float)$version;
+        $request->version = (float)$version;
 
         return $request;
     }
@@ -721,7 +731,7 @@ class Request implements ServerRequestInterface
      */
     public function getProtocolVersion()
     {
-        return sprintf('%01.1F', $this->_version);
+        return sprintf('%01.1F', $this->version);
     }
 
     /**
@@ -733,7 +743,7 @@ class Request implements ServerRequestInterface
     public function getHeaderLines($header)
     {
         $lines = [];
-        foreach ($this->_headers as $name => $headers) {
+        foreach ($this->headers as $name => $headers) {
             if (strtolower($name) == strtolower($header)) {
                 $lines = $headers;
             }
@@ -762,7 +772,7 @@ class Request implements ServerRequestInterface
         $request = clone $this;
         $keep_headers = [];
         $found = false;
-        foreach ($request->_headers as $name => $headers) {
+        foreach ($request->headers as $name => $headers) {
             if (strtolower($name) !== strtolower($header)) {
                 $keep_headers[$name] = $headers;
             } else {
@@ -773,7 +783,7 @@ class Request implements ServerRequestInterface
         if (!$found) {
             $keep_headers[$header] = is_array($value) ? $value : [(string)$value];
         }
-        $request->_headers = $keep_headers;
+        $request->headers = $keep_headers;
 
         return $request;
     }
@@ -879,7 +889,7 @@ class Request implements ServerRequestInterface
     public function withRequestTarget($requestTarget)
     {
         $request = clone $this;
-        $request->_url = new Url($requestTarget);
+        $request->url = new Url($requestTarget);
 
         return $request;
     }
@@ -901,7 +911,7 @@ class Request implements ServerRequestInterface
     public function withCookieParams(array $cookies)
     {
         $request = clone $this;
-        $request->_cookies = array_merge_recursive($request->_cookies, $cookies);
+        $request->cookies = array_merge_recursive($request->cookies, $cookies);
 
         return $request;
     }
@@ -931,7 +941,7 @@ class Request implements ServerRequestInterface
     public function withQueryParams(array $query)
     {
         $request = clone $this;
-        $request->_queryParams = $query;
+        $request->queryParams = $query;
 
         return $request;
     }
@@ -952,7 +962,7 @@ class Request implements ServerRequestInterface
      */
     public function getParsedBody()
     {
-        return $this->_parsedBody;
+        return $this->parsedBody;
     }
 
     /**
@@ -984,7 +994,7 @@ class Request implements ServerRequestInterface
     public function withParsedBody($data)
     {
         $request = clone $this;
-        $request->_parsedBody = $data;
+        $request->parsedBody = $data;
         return $request;
     }
 
@@ -1006,7 +1016,7 @@ class Request implements ServerRequestInterface
     public function withAttribute($name, $value)
     {
         $request = clone $this;
-        $request->_attributes[$name] = $value;
+        $request->attributes[$name] = $value;
 
         return $request;
     }
@@ -1030,8 +1040,8 @@ class Request implements ServerRequestInterface
     {
         $request = clone $this;
 
-        if (isset($request->_attributes[$name])) {
-            unset($request->_attributes[$name]);
+        if (isset($request->attributes[$name])) {
+            unset($request->attributes[$name]);
         }
 
         return $request;

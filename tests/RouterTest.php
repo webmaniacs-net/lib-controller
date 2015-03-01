@@ -89,7 +89,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     public function testGetChildInTree()
     {
         $params = [];
-        $matched = '';
+        $matched = null;
         $root = new RootRouterMock();
         $this->assertEquals('r4', $root->getChild('path3/path1', $params, $matched)->id); // actually returns child but not last matched leaf
 

@@ -123,7 +123,7 @@ class Response implements ResponseInterface
 
 
     /**
-     * @return unknown
+     * @return array
      */
     public function getCookies()
     {
@@ -131,15 +131,15 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @param unknown_type $cookies
+     * @param array $cookies
      */
-    public function setCookies($cookies)
+    public function setCookies(array $cookies)
     {
         $this->_cookies = $cookies;
     }
 
     /**
-     * @param unknown_type $sessions
+     * @param array $sessions
      */
     public function setSessions($sessions)
     {
@@ -166,10 +166,10 @@ class Response implements ResponseInterface
      * Set response cookie
      *
      * @param string $name
-     * @param unknown_type $value
-     * @param unknown_type $expire
-     * @param unknown_type $path
-     * @return unknown
+     * @param mixed $value
+     * @param int $expire
+     * @param string $path
+     * @return Response
      */
     public function setCookie($name, $value, $expire = null, $path = '/')
     {

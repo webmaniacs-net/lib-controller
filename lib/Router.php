@@ -440,9 +440,9 @@ class Router extends Route
     {
         $params = array();
 
-        $matched = '';
+        $matched = null;
         if (($route = $this->getChild($request->getUrlPath(), $params, $matched)) && $matched) {
-            $subrequest = $request->subrequest($matched);
+            $subrequest = $request->withBaseUrl($matched);
 
             foreach ($params as $name => $value) {
                 $subrequest = $subrequest->withAttribute($name, $value);

@@ -56,7 +56,8 @@ class Middleware implements HttpKernelInterface
     public function handle(SymfonyRequest $symfonyRequest, $type = self::MASTER_REQUEST, $catch = true)
     {
         // create lib request from Symfony request
-        $request = new Request(new Url($symfonyRequest->getBaseUrl()), new Url($symfonyRequest->getRequestUri()), $symfonyRequest->getMethod());
+        $request = new Request(new Url($symfonyRequest->getRequestUri()), $symfonyRequest->getMethod());
+        $request = $request->withBaseUrl(new Url($symfonyRequest->getBaseUrl()));
         $response = new Response($request);
         try {
             $response = $this->router->dispatch($request, $response);

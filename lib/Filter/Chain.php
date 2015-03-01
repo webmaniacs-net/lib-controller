@@ -133,7 +133,7 @@ class Chain implements LoggerAwareInterface
     {
         $stack = array();
         foreach ($this->_filters as list($filter, $arguments)) {
-            $stack[] = $filter->__toString();
+            $stack[] = (string)$filter;
         }
 
         return implode(' > ', $stack);
