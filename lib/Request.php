@@ -745,7 +745,7 @@ class Request implements ServerRequestInterface
         $lines = [];
         foreach ($this->headers as $name => $headers) {
             if (strtolower($name) == strtolower($header)) {
-                $lines = $headers;
+                $lines = array_merge($lines, $headers);
             }
         }
         return $lines;
@@ -807,7 +807,23 @@ class Request implements ServerRequestInterface
      */
     public function withAddedHeader($header, $value)
     {
+        $request = clone $this;
+        $keep_headers = [];
+        $found = false;
+        foreach ($request->headers as $name => $headers) {
+            if (strtolower($name) !== strtolower($header)) {
+                $keep_headers[$name] = $headers;
+            } else {
+                $keep_headers[$name] = array_merge($request->headers[$name], is_array($value) ? $value : [(string)$value]);
+                $found = true;
+            }
+        }
+        if (!$found) {
+            $keep_headers[$header] = is_array($value) ? $value : [(string)$value];
+        }
+        $request->headers = $keep_headers;
 
+        return $request;
     }
 
     /**
