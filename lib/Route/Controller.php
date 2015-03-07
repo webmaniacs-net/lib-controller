@@ -199,13 +199,25 @@ class Controller extends Route
         }
     }
 
+    /**
+     * @param \ReflectionClass $expectedClass
+     * @return Object|null
+     */
+    protected function injectObjectByClass(\ReflectionClass $expectedClass)
+    {
+        if ($expectedClass->isInstance($this)) {
+            return $this;
+        } else {
+            return null;
+        }
+    }
+
     protected function _dispatchMethod(
         \ReflectionMethod $method,
         Request $request,
         Response $response,
         array $arguments = []
-    )
-    {
+    ) {
         /**
          * Create view
          */
@@ -214,34 +226,34 @@ class Controller extends Route
         foreach ($method->getParameters() as $param) {
             $param_name = $param->getName();
 
+            $value = null;
             /* @var $param \ReflectionParameter */
             if ($param_class = $param->getClass()) {
-                switch ($param_class->getName()) {
-                    case self::CLASS:
-                        $signature[$param_name] = $this;
-                        continue 2;
-                    case Response::CLASS:
-                        $signature[$param_name] = $response;
-                        continue 2;
-                    case Request::CLASS:
-                        $signature[$param_name] = $request;
-                        continue 2;
+                if ($param_class->isInstance($response)) {
+                    $value = $response;
+                } elseif ($param_class->isInstance($request)) {
+                    $value = $request;
+                } else {
+                    $value = $this->injectObjectByClass($param_class);
                 }
             }
+            if ($value === null) {
+                try {
+                    $value = $this->_prepareMethodParam($param_name, $request, $arguments);
+                } catch (PropertyNotFoundException $e) {
+                    if ($param->isOptional()) {
+                        $value = $param->getDefaultValue();
+                    } else {
+                        throw $e;
+                    }
+                }
 
-            $value = null;
-            try {
-                $value = $this->_prepareMethodParam($param_name, $request, $arguments);
-            } catch (PropertyNotFoundException $e) {
-                if ($param->isOptional()) $value = $param->getDefaultValue();
-                else throw $e;
-            }
-
-            if ($param->isOptional() && ($default = $param->getDefaultValue()) !== null) {
-                if (is_int($default)) {
-                    $value = (int)($value);
-                } elseif (is_bool($default)) {
-                    $value = (bool)($value);
+                if ($param->isOptional() && ($default = $param->getDefaultValue()) !== null) {
+                    if (is_int($default)) {
+                        $value = (int)($value);
+                    } elseif (is_bool($default)) {
+                        $value = (bool)($value);
+                    }
                 }
             }
 
