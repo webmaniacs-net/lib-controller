@@ -59,6 +59,14 @@ class Controller extends Route
     }
 
     /**
+     * @return IResponseDecorator|null
+     */
+    public function getResponseDecorator()
+    {
+        return $this->_responseDecorator;
+    }
+
+    /**
      * Initilize method reflection
      *
      * @throws \Exception something wrong
@@ -156,21 +164,21 @@ class Controller extends Route
 
 
         if ($return instanceof Response) {
-            $response = $return;
-            $return = [];
+            return $return;
+        } else {
+
+
+            $response = $this->_decorateResponse($response,
+                array_merge($request->getAttributes(), $arguments), $return ? (array)$return : []);
+
+            return $response;
         }
-
-
-        $response = $this->_decorateResponse($response,
-            array_merge($request->getAttributes(), $arguments, $return ? (array)$return : []));
-
-        return $response;
     }
 
-    protected function _decorateResponse(Response $response, $params)
+    protected function _decorateResponse(Response $response, $attributes, $params)
     {
         if ($this->_responseDecorator) {
-            return $this->_responseDecorator->decorateResponse($response, $params);
+            return $this->_responseDecorator->decorateResponse($response, $attributes, $params);
         } else {
             return $response;
         }
@@ -192,6 +200,8 @@ class Controller extends Route
 
         if (isset($arguments[$param_name])) {
             return $arguments[$param_name];
+        } elseif (isset($this->properties[$param_name])) {
+            return $this->properties[$param_name];
         } elseif ($request->hasAttribute($param_name)) {
             return $request->getAttribute($param_name);
         } else {

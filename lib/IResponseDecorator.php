@@ -6,8 +6,9 @@ interface IResponseDecorator
 {
     /**
      * @param Response $response
-     * @param $params
-     * @return Response
+     * @param array $arguments
+     * @param array $return
+     * @return mixed
      */
-    public function decorateResponse(Response $response, $params);
+    public function decorateResponse(Response $response, array $arguments, array $return);
 }
