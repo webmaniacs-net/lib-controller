@@ -6,7 +6,6 @@ use wmlib\controller\IResponseDecorator;
 use wmlib\controller\Request;
 use wmlib\controller\Response;
 use wmlib\controller\Route;
-use wmlib\controller\Router;
 
 /**
  * MVC controller route
@@ -185,18 +184,19 @@ class Controller extends Route
     }
 
     /**
-     * @param string $param_name
+     * @param \ReflectionParameter $param
      * @param Request $request
      * @param array $arguments
      * @return mixed
      * @throws PropertyNotFoundException
      */
     protected function _prepareMethodParam(
-        $param_name,
+        \ReflectionParameter $param,
         Request $request,
         array $arguments = []
     )
     {
+        $param_name = $param->getName();
 
         if (isset($arguments[$param_name])) {
             return $arguments[$param_name];
@@ -249,7 +249,7 @@ class Controller extends Route
             }
             if ($value === null) {
                 try {
-                    $value = $this->_prepareMethodParam($param_name, $request, $arguments);
+                    $value = $this->_prepareMethodParam($param, $request, $arguments);
                 } catch (PropertyNotFoundException $e) {
                     if ($param->isOptional()) {
                         $value = $param->getDefaultValue();
