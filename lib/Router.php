@@ -39,7 +39,6 @@ class Router extends Route
     final protected function _initialize()
     {
         if (!$this->_initialized) {
-
             $this->init();
 
             if (($this->_callback !== null) && is_callable($this->_callback)) {
@@ -68,7 +67,6 @@ class Router extends Route
 
         $removed = false;
         if ($route instanceof Route) {
-
             if ($this->_routes->contains($route)) {
                 $this->_routes->detach($route);
                 $removed = true;
@@ -95,17 +93,18 @@ class Router extends Route
      */
     public function addRoute($pattern, Route $route, $name = null, array $attributes = [])
     {
-
-        //$route->parent = $this;
-
         if ($name && isset($this->_names[$name])) {
             throw new \OutOfBoundsException('Route with "' . $name . '" already exists');
         } elseif ($route instanceof Router) {
             $this->_routes->addAll($route->_routes);
             $route->_routes = $this->_routes;
         }
-        $this->_routes->attach($route,
-            ['pattern' => $pattern, 'name' => $name, 'attributes' => $attributes, 'router' => $this]);
+        $this->_routes->attach($route, [
+            'pattern' => $pattern,
+            'name' => $name,
+            'attributes' => $attributes,
+            'router' => $this
+        ]);
 
         if ($name) {
             $this->_names[$name] = $route;
@@ -165,27 +164,6 @@ class Router extends Route
             throw new \OutOfBoundsException(sprintf("Route %s not found in tree", $name));
         }
     }
-
-    /**
-     * Get routing object by name. Look in overall tree
-     *
-     * @throws \OutOfBoundsException
-     * @param string $name
-     * @return Route
-     */
-    /*public function getChildRoute($name)
-    {
-        $this->_initialize();
-
-        if (isset($this->_names[$name])) {
-            $route = $this->_names[$name];
-            return $route;
-
-
-        } else {
-            throw new \OutOfBoundsException(sprintf("Route %s not found", $name));
-        }
-    }*/
 
     /**
      * @param Route $child
@@ -537,11 +515,10 @@ class Router extends Route
             $route = $info['router'];
         }
 
-        $root = new Url('/');
-        if (isset($uri)) {
-            return $root->resolve($uri);
-        } else{
-            return $root;
+        if (isset($uri) && (string)$uri) {
+            return $uri;
+        } else {
+            return new Url('/');
         }
     }
 
