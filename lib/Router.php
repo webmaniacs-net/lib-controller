@@ -537,8 +537,12 @@ class Router extends Route
             $route = $info['router'];
         }
 
-
-        return isset($uri) ? $uri : new Url('/');
+        $root = new Url('/');
+        if (isset($uri)) {
+            return $root->resolve($uri);
+        } else{
+            return $root;
+        }
     }
 
     /**
