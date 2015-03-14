@@ -149,26 +149,28 @@ class Controller extends Route
             $method_name = 'post' . $this->action;
             $reflection = new \ReflectionObject($this->controller);
             if ($reflection->hasMethod($method_name)) {
-                $post_return = $this->_dispatchMethod($reflection->getMethod($method_name), $request, $response,
-                    $arguments);
+                $post_return = $this->_dispatchMethod(
+                    $reflection->getMethod($method_name),
+                    $request,
+                    $response,
+                    $arguments
+                );
                 if ($post_return === self::POST_REDIRECT) {
-
                     return Response\Factory::Redirect($response, $request->getUrl(true));
                 }
             }
         }
 
-
         $return = $this->_dispatchMethod($this->reflectionMethod, $request, $response, $arguments);
-
 
         if ($return instanceof Response) {
             return $return;
         } else {
-
-
-            $response = $this->_decorateResponse($response,
-                array_merge($request->getAttributes(), $arguments), $return ? (array)$return : []);
+            $response = $this->_decorateResponse(
+                $response,
+                array_merge($request->getAttributes(), $arguments),
+                $return ? (array)$return : []
+            );
 
             return $response;
         }

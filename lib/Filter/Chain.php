@@ -61,8 +61,13 @@ class Chain implements LoggerAwareInterface
         return $this;
     }
 
+    public function setArgument($name, $value)
+    {
+        $this->_arguments[$name] = $value;
+    }
+
     /**
-     * Get current filter arguments
+     * Get current chain arguments
      *
      * @return array
      */

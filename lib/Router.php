@@ -422,6 +422,10 @@ class Router extends Route
         if (($route = $this->getChild($request->getUrlPath(), $params, $matched)) && $matched) {
             $subrequest = $request->withBaseUrl($matched);
 
+            foreach ($this->properties as $name => $value) {
+                $subrequest = $subrequest->withAttribute($name, $value);
+            }
+
             foreach ($params as $name => $value) {
                 $subrequest = $subrequest->withAttribute($name, $value);
             }

@@ -119,6 +119,10 @@ abstract class Route implements LoggerAwareInterface
             if ($pre_response instanceof Response) {
                 $response = $pre_response;
             } else {
+                foreach ($this->filterChain->getArguments() as $name => $value) {
+                    $request = $request->withAttribute($name, $value);
+                }
+
                 $dispatch_response = $this->dispatchRoute($request, $response, $arguments);
                 if ($dispatch_response instanceof Response) {
                     $response = $dispatch_response;
