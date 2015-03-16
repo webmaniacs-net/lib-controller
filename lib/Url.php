@@ -33,6 +33,26 @@ class Url extends Uri
         return $uri;
     }
 
+    /**
+     * @param string $name Slug name
+     * @param string $value Slug candidate value. Will contain filtered (URL-ready) value after
+     * @param callable $test callback to make unique value. Should return true for "bad" value
+     * @return Url
+     */
+    public function withQuerySlug($name, &$value, callable $test = null)
+    {
+        $value = \URLify::filter($value);
+
+        if (is_callable($test)) {
+            $i = 1; $base = $value;
+            while(call_user_func($test, $value)) {
+                $i+=rand(1, 99);
+                $value = $base.'-'.$i;
+            }
+        }
+
+        return $this->withQueryValue($name, $value);
+    }
 
     /**
      * Push values to query encoded
@@ -54,6 +74,4 @@ class Url extends Uri
 
         return $uri;
     }
-
-
 }
