@@ -207,8 +207,6 @@ class Controller extends Route
         } elseif ($request->hasAttribute($param_name)) {
             return $request->getAttribute($param_name);
         } else {
-            print_r($arguments);
-            die();
             throw new PropertyNotFoundException("Controller action argument $param_name not found");
         }
     }
