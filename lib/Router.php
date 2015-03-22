@@ -297,10 +297,11 @@ class Router extends Route
             $data = $this->_routes->getInfo();
 
             if ($data['router'] === $this) {
-                $match_params = $route->getDefault();
+                /** @var $route Route */
+                $match_params = array_merge($route->getDefault(), $data['attributes']);
 
                 if (($suburl = self::_IsMatch($data['pattern'], $uri, $match_params)) !== false) {
-                    $params = array_merge($data['attributes'], $params, $match_params);
+                    $params = array_merge($params, $match_params);
 
                     if (($suburl === '') || ($route instanceof self)) {
                         $matched = self::BuildUri($data['pattern'], $match_params);
@@ -345,7 +346,7 @@ class Router extends Route
                     $index = substr($index, 1);
 
                     //if (!$rule)
-                    $Parsed[$rule][] = [2, ''];
+                    $Parsed[$rule][] = [2, self::URI_DELIMITER];
                 } else {
                     $static = (($pos = strpos($index, self::URI_DELIMITER)) !== false) ? substr($index, 0,
                         $pos) : $index;
@@ -375,8 +376,7 @@ class Router extends Route
             }
         }
 
-
-        $uri = new Url(implode(self::URI_DELIMITER, $parts));
+        $uri = new Url(implode('', $parts));
 
         if ((sizeof($missed) > 0) && $addMissedToQuery) {
             $uri = $uri->withQueryValues($missed);
@@ -509,7 +509,9 @@ class Router extends Route
             $info = $this->_routes->offsetGet($route);
             $pattern = $info['pattern'];
 
-            $route_uri = self::BuildUri($pattern, array_merge($route->default, (array)$params), $addMissedToQuery);
+            $params = array_merge($route->default, $info['attributes'], (array)$params);
+
+            $route_uri = self::BuildUri($pattern, $params, $addMissedToQuery);
 
             if (isset($uri)) {
                 $uri = $route_uri->resolve($uri);
