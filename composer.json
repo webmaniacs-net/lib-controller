@@ -25,7 +25,7 @@
   },
   "require": {
     "psr/http-message": "~0.9",
-    "webmaniacs.net/lib-uri": "~1.0",
+    "webmaniacs.net/lib-uri": "dev-master",
     "psr/log": "~1.0",
     "jbroadway/urlify": "1.0.4-stable"
   },
