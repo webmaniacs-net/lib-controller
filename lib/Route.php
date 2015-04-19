@@ -150,7 +150,6 @@ abstract class Route implements LoggerAwareInterface
         return get_class($this);
     }
 
-
     /**
      * Logs the method call or the executed SQL statement.
      *
