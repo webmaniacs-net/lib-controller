@@ -13,8 +13,8 @@ use wmlib\controller\Route;
  */
 class Controller extends Route
 {
-    const HANDLER_SKIP_RENDER = 2;
-    const POST_REDIRECT = 1;
+    const SKIP_RENDER = 2;
+    const RELOAD = 1;
 
     /**
      * @var IResponseDecorator
@@ -155,7 +155,7 @@ class Controller extends Route
                     $response,
                     $arguments
                 );
-                if ($post_return === self::POST_REDIRECT) {
+                if ($post_return === self::RELOAD) {
                     return Response\Factory::Redirect($response, $request->getUrl(true));
                 }
             }
@@ -165,7 +165,9 @@ class Controller extends Route
 
         if ($return instanceof Response) {
             return $return;
-        } else {
+        } elseif ($return === self::RELOAD) {
+            return Response\Factory::Redirect($response, $request->getUrl(true));
+        } elseif ($return !== self::SKIP_RENDER) {
             $response = $this->_decorateResponse(
                 $response,
                 array_merge($request->getAttributes(), $arguments),
@@ -206,6 +208,8 @@ class Controller extends Route
             return $this->properties[$param_name];
         } elseif ($request->hasAttribute($param_name)) {
             return $request->getAttribute($param_name);
+        } elseif ($param->isDefaultValueAvailable()) {
+            return $param->getDefaultValue();
         } else {
             throw new PropertyNotFoundException("Controller action argument $param_name not found");
         }

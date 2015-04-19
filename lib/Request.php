@@ -220,10 +220,15 @@ class Request implements ServerRequestInterface
 
     public function isXHR()
     {
-        return (
-            $this->hasHeader(self::HEADER_X_REQUESTED_WITH)
-            || ($this->hasParam('ajax') && $this->getParam('ajax'))
-        );
+        if ($this->hasHeader(self::HEADER_X_REQUESTED_WITH)) {
+            $value = $this->getHeader(self::HEADER_X_REQUESTED_WITH);
+
+            return strtolower($value) === 'xmlhttprequest';
+        } elseif ($this->hasParam('ajax') && $this->getParam('ajax')) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 
@@ -539,7 +544,7 @@ class Request implements ServerRequestInterface
      */
     public function getFileParams()
     {
-        // TODO: Implement getFileParams() method.
+        return [];
     }
 
     /**

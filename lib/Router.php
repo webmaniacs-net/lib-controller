@@ -218,6 +218,23 @@ class Router extends Route
     }
 
     /**
+     * @param Route $child
+     * @return mixed[]
+     */
+    public function getAttributes(Route $child)
+    {
+        if ($this->_initialize()->_routes->contains($child)) {
+
+            $data = $this->_initialize()->_routes->offsetGet($child);
+            $arguments = $data['attributes'];
+
+            return $arguments;
+        }
+
+        return [];
+    }
+
+    /**
      * Check if route is matched to pattern
      *
      * @param $pattern
@@ -329,7 +346,7 @@ class Router extends Route
      * @return Url
      * @throws \Exception Something goes wrong
      */
-    public static function BuildUri($rule, $params = [], $addMissedToQuery = true)
+    public static function BuildUri($rule, $params = [], $arguments = [], $addMissedToQuery = true)
     {
         static $Parsed = [];
 
@@ -358,6 +375,7 @@ class Router extends Route
             }
         }
 
+
         $parts = [];
         $missed = $params;
         foreach ($Parsed[$rule] as list($type, $part)) {
@@ -368,6 +386,8 @@ class Router extends Route
                     if (isset($missed[$part])) {
                         unset($missed[$part]);
                     }
+                } elseif (isset($arguments[$part])) {
+                    $parts[] = urlencode($arguments[$part]);
                 } else {
                     throw new \Exception(sprintf('Varible "%s" not specified for url pattern "%s"', $part, $rule));
                 }
@@ -509,15 +529,19 @@ class Router extends Route
             $info = $this->_routes->offsetGet($route);
             $pattern = $info['pattern'];
 
-            $params = array_merge($route->default, $info['attributes'], (array)$params);
+            $params = array_merge($route->default, (array)$params);
 
-            $route_uri = self::BuildUri($pattern, $params, $addMissedToQuery);
+            $route_uri = self::BuildUri($pattern, $params, $info['attributes'], $addMissedToQuery);
+
+
 
             if (isset($uri)) {
                 $uri = $route_uri->resolve($uri);
             } else {
                 $uri = $route_uri;
             }
+
+
 
             $route = $info['router'];
         }
