@@ -1,6 +1,7 @@
 <?php
 namespace wmlib\controller\Route;
 
+use wmlib\controller\Exception\NotFoundException;
 use wmlib\controller\Exception\PropertyNotFoundException;
 use wmlib\controller\IResponseDecorator;
 use wmlib\controller\Request;
@@ -15,6 +16,7 @@ class Controller extends Route
 {
     const SKIP_RENDER = 2;
     const RELOAD = 1;
+    const NOT_FOUND = 3;
 
     /**
      * @var IResponseDecorator
@@ -167,6 +169,8 @@ class Controller extends Route
             return $return;
         } elseif ($return === self::RELOAD) {
             return Response\Factory::Redirect($response, $request->getUrl(true));
+        } elseif ($return === self::NOT_FOUND) {
+            throw new NotFoundException();
         } elseif ($return !== self::SKIP_RENDER) {
             $response = $this->_decorateResponse(
                 $response,
