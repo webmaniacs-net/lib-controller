@@ -16,7 +16,9 @@ class Factory
     {
         $request = $response->getRequest();
 
-        $redirect_uri = $request->getBaseUrl()->resolve(is_string($url) ? new Url($url) : $url);
+        $url = is_string($url) ? new Url($url) : $url;
+
+        $redirect_uri = $request->getBaseUrl()->resolve($url);
 
         if ($request->isPost() && $request->isXHR()) {
             /**

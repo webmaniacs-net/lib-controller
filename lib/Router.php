@@ -546,7 +546,7 @@ class Router extends Route
             $route = $info['router'];
         }
 
-        if (isset($uri) && (string)$uri) {
+        if (isset($uri)) {
             return $uri;
         } else {
             return new Url('/');

@@ -172,6 +172,7 @@ class Controller extends Route
         } elseif ($return === self::NOT_FOUND) {
             throw new NotFoundException();
         } elseif ($return !== self::SKIP_RENDER) {
+
             $response = $this->_decorateResponse(
                 $response,
                 array_merge($request->getAttributes(), $arguments),
