@@ -16,7 +16,7 @@ class Router extends Route
     private $_initialized = false;
     private $_callback;
 
-    private $_childs = array();
+    private $childs = array();
 
 
     protected function __construct(callable $callback = null)
@@ -50,7 +50,6 @@ class Router extends Route
             }
 
 
-
             $this->_initialized = true;
         }
 
@@ -76,7 +75,7 @@ class Router extends Route
         }
 
         if ($removed) {
-            $this->_childs = array();
+            $this->childs = [];
         }
 
         return $removed;
@@ -114,7 +113,7 @@ class Router extends Route
             $route->logger = $this->logger;
         }
 
-        $this->_childs = [];
+        $this->childs = [];
 
         return $route;
     }
@@ -300,8 +299,8 @@ class Router extends Route
     {
         $key = md5((string)$uri . var_export($params, true));
 
-        if (isset($this->_initialize()->_childs[$key])) {
-            list($return, $found_params, $matched) = $this->_childs[$key];
+        if (isset($this->_initialize()->childs[$key])) {
+            list($return, $found_params, $matched) = $this->childs[$key];
 
             foreach ($found_params as $n => $v) {
                 $params[$n] = $v;
@@ -321,9 +320,9 @@ class Router extends Route
                     $params = array_merge($params, $match_params);
 
                     if (($suburl === '') || ($route instanceof self)) {
-                        $matched = self::BuildUri($data['pattern'], $match_params,  $data['attributes']);
+                        $matched = self::BuildUri($data['pattern'], $match_params, $data['attributes']);
 
-                        $this->_childs[$key] = array($route, &$params, $matched);
+                        $this->childs[$key] = array($route, &$params, $matched);
 
                         return $route;
                     }
@@ -332,7 +331,7 @@ class Router extends Route
         }
 
 
-        $this->_childs[$key] = array(null, &$params, $matched);
+        $this->childs[$key] = [null, &$params, $matched];
 
         return null;
     }
@@ -514,7 +513,7 @@ class Router extends Route
         }
     }
 
-    
+
     /**
      * Build route uri
      *
@@ -535,13 +534,11 @@ class Router extends Route
             $route_uri = self::BuildUri($pattern, $params, $info['attributes'], $addMissedToQuery);
 
 
-
             if (isset($uri)) {
                 $uri = $route_uri->resolve($uri);
             } else {
                 $uri = $route_uri;
             }
-
 
 
             $route = $info['router'];
