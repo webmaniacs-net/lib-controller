@@ -321,7 +321,7 @@ class Router extends Route
                     $params = array_merge($params, $match_params);
 
                     if (($suburl === '') || ($route instanceof self)) {
-                        $matched = self::BuildUri($data['pattern'], $route->getDefault(),  $data['attributes']);
+                        $matched = self::BuildUri($data['pattern'], $match_params,  $data['attributes']);
 
                         $this->_childs[$key] = array($route, &$params, $matched);
 
