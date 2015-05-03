@@ -321,7 +321,7 @@ class Router extends Route
                     $params = array_merge($params, $match_params);
 
                     if (($suburl === '') || ($route instanceof self)) {
-                        $matched = self::BuildUri($data['pattern'], $match_params);
+                        $matched = self::BuildUri($data['pattern'], $route->getDefault(),  $data['attributes']);
 
                         $this->_childs[$key] = array($route, &$params, $matched);
 
@@ -378,6 +378,7 @@ class Router extends Route
 
         $parts = [];
         $missed = $params;
+
         foreach ($Parsed[$rule] as list($type, $part)) {
 
             if ($type === 1) {
