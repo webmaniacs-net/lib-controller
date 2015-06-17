@@ -47,7 +47,7 @@ class Request implements ServerRequestInterface
      *
      * @var Url
      */
-    private $url;
+    protected $url;
 
     /**
      * Request method
@@ -72,19 +72,19 @@ class Request implements ServerRequestInterface
      *
      * @var Url
      */
-    private $baseUrl;
+    protected $baseUrl;
 
     private $input;
 
     /**
      * @var Session
      */
-    private $session;
+    protected $session;
 
     /**
      * @var array
      */
-    private $cookies;
+    protected $cookies;
 
     /**
      * @var array
