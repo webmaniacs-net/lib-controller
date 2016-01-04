@@ -110,7 +110,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * @return Session
+     * @return Session|null
      */
     public function getSession()
     {
