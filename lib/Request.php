@@ -861,7 +861,7 @@ class Request implements ServerRequestInterface
      * @return self
      * @throws \InvalidArgumentException When the body is not valid.
      */
-    public function withBody(StreamableInterface $body)
+    public function withBody(Psr\Http\Message\StreamInterface $body)
     {
 
     }
