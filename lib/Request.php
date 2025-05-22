@@ -691,7 +691,7 @@ class Request implements ServerRequestInterface
      * @param UriInterface $uri New request URI to use.
      * @return self
      */
-    public function withUri(UriInterface $uri)
+    public function withUri(UriInterface $uri, $preserveHost = false)
     {
         if ($uri instanceof Url) {
             $url = clone $uri;
