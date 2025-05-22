@@ -1,7 +1,6 @@
 <?php
 namespace wmlib\controller;
 
-use Psr\Http\Message\StreamableInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\StreamInterface;
@@ -862,7 +861,7 @@ class Request implements ServerRequestInterface
      * @return self
      * @throws \InvalidArgumentException When the body is not valid.
      */
-    public function withBody(Psr\Http\Message\StreamInterface $body)
+    public function withBody(StreamInterface $body)
     {
 
     }
