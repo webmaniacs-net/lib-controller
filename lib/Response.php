@@ -600,4 +600,9 @@ class Response implements ResponseInterface
 
         return $response;
     }
+
+    public function getHeaderLine($name)
+    {
+        // TODO: Implement getHeaderLine() method.
+    }
 }
