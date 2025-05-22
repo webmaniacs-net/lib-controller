@@ -4,6 +4,7 @@ namespace wmlib\controller;
 use Psr\Http\Message\StreamableInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Request object
@@ -617,7 +618,7 @@ class Request implements ServerRequestInterface
     /**
      * Gets the body of the message.
      *
-     * @return StreamableInterface|null Returns the body, or null if not set.
+     * @return StreamInterface|null Returns the body, or null if not set.
      */
     public function getBody()
     {
@@ -851,13 +852,13 @@ class Request implements ServerRequestInterface
     /**
      * Create a new instance, with the specified message body.
      *
-     * The body MUST be a StreamableInterface object.
+     * The body MUST be a StreamInterface object.
      *
      * This method MUST be implemented in such a way as to retain the
      * immutability of the message, and MUST return a new instance that has the
      * new body stream.
      *
-     * @param StreamableInterface $body Body.
+     * @param StreamInterface $body Body.
      * @return self
      * @throws \InvalidArgumentException When the body is not valid.
      */
